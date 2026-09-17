@@ -31,9 +31,18 @@ test('un titre valide crée le questionnaire (201)', async () => {
 
 // ── Jalon 2 ───────────────────────────────────────────────────────────────
 
-test.todo('une question sans bonne réponse est refusée (400)');
-test.todo('une question avec deux bonnes réponses est refusée (400)');
-test.todo('une question valide est ajoutée et apparaît dans GET /api/quizzes/:id');
+test.todo('une question sans bonne réponse est refusée (400)', async () => {
+  // TODO : écrire le test
+  const { status, data } = await api.request('POST', '/api/quizzes', { title: 'Capitales' });
+  assert.equal(status, 400);
+  as
+});
+test.todo('une question avec deux bonnes réponses est refusée (400)', async () => {
+  // TODO : écrire le test
+});
+test.todo('une question valide est ajoutée et apparaît dans GET /api/quizzes/:id', async () => {
+  // TODO : écrire le test
+});
 
 // ── Jalon 3 : d'abord le test qui échoue, ensuite la correction ───────────
 
