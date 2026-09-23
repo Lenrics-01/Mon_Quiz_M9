@@ -59,14 +59,61 @@ auth.get('/api/auth/callback', async (req, res) => {
   //     en-tête accept: application/json. La réponse contient access_token.
   //     Cet appel part du SERVEUR : c'est le seul endroit où le secret sert.
   //
+  const tokenResponse = await fetch("https://github.com/login/oauth/access_token", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify({
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      code: code,
+      redirect_uri: CALLBACK_URL
+    })
+  })
+  if(!tokenResponse.ok) {
+    console.error("Erreur lors de l'échange du code contre un jeton :", tokenResponse.statusText);
+    return res.status(500).json({ error: 'Erreur lors de l’échange du code contre un jeton.' });
+  }
+
+  const access_token = await tokenResponse.json();
+
   // 3b. Le jeton contre le profil : GET https://api.github.com/user avec
   //     l'en-tête authorization: Bearer <jeton>. La réponse : { id, login,
   //     name, avatar_url }.
   //
+
+  const ProfileResponse = await fetch("https://api.github.com/user", {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${access_token.access_token}`,
+      "Accept": "application/json"
+    }
+  })
+  if(!ProfileResponse.ok) {
+    console.error("Erreur lors de la récupération du profil utilisateur :", ProfileResponse.statusText);
+    return res.status(500).json({ error: 'Erreur lors de la récupération du profil utilisateur.' });
+  }
+  const user = await ProfileResponse.json();
+
   // 4.  repository.findOrCreateAccount({ githubId, login, name, avatarUrl }),
   //     puis writeSession(res, { accountId: account.id }) et une redirection
   //     vers /quizzes. Le jeton n'est pas gardé : on n'en a plus besoin.
-  res.status(501).json({ error: 'À faire : le rappel OAuth.' });
+
+  const account = await repository.findOrCreateAccount({
+    githubId: user.id,
+    login: user.login,
+    name: user.name,
+    avatarUrl: user.avatar_url
+  });
+  writeSession(res, { accountId: account.id });
+  res.redirect('/quizzes');
+
+  if (!account) {
+    console.error("Erreur lors de la création ou récupération du compte :", account);
+    return res.status(500).json({ error: 'Erreur lors de la création ou récupération du compte.' });
+  }
 });
 
 // La déconnexion : on efface le cookie. GitHub n'est pas concerné.
