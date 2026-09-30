@@ -9,6 +9,7 @@
 -- 1970, l'horloge du SERVEUR (Date.now() côté Node). SQLite n'a ni BIGINT
 -- ni BOOLEAN : ses entiers font 64 bits, et un booléen est 0 ou 1.
 
+<<<<<<< HEAD
 -- Un compte se connecte avec GitHub (github_id) ou, pour les comptes de
 -- démonstration du seed, avec un mot de passe (password_hash).
 CREATE TABLE IF NOT EXISTS account (
@@ -19,15 +20,29 @@ CREATE TABLE IF NOT EXISTS account (
   avatar_url    TEXT,
   password_hash TEXT,
   is_admin      INTEGER NOT NULL DEFAULT 0   -- 0 ou 1
+=======
+-- Un compte est une identité GitHub : pas de mot de passe chez nous.
+CREATE TABLE IF NOT EXISTS account (
+  id         INTEGER PRIMARY KEY,
+  github_id  INTEGER NOT NULL UNIQUE,
+  login      TEXT NOT NULL,
+  name       TEXT,
+  avatar_url TEXT
+>>>>>>> c3292296bc21da086aacb6a14bea29d9e5c378c2
 );
 
 CREATE TABLE IF NOT EXISTS quiz (
   id         INTEGER PRIMARY KEY,
   -- NULL pour les questionnaires de démonstration ; l'auteur, sinon.
+<<<<<<< HEAD
   account_id  INTEGER REFERENCES account(id),
   title       TEXT NOT NULL,
   -- Affichée au catalogue ; **gras** et *italique* permis.
   description TEXT NOT NULL DEFAULT ''
+=======
+  account_id INTEGER REFERENCES account(id),
+  title      TEXT NOT NULL
+>>>>>>> c3292296bc21da086aacb6a14bea29d9e5c378c2
 );
 
 CREATE TABLE IF NOT EXISTS question (
@@ -50,8 +65,11 @@ CREATE TABLE IF NOT EXISTS choice (
 CREATE TABLE IF NOT EXISTS game (
   id                  INTEGER PRIMARY KEY,
   quiz_id             INTEGER NOT NULL REFERENCES quiz(id),
+<<<<<<< HEAD
   -- L'animateur : le compte qui a créé la partie.
   account_id          INTEGER REFERENCES account(id),
+=======
+>>>>>>> c3292296bc21da086aacb6a14bea29d9e5c378c2
   -- Le code à six chiffres affiché par l'animateur.
   code                TEXT NOT NULL UNIQUE,
   -- 'lobby' | 'question' | 'results' | 'finished'
